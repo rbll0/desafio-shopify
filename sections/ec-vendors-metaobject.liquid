@@ -1,0 +1,383 @@
+{%- style -%}
+  #ec-vendors-{{ section.id }} {
+    --ec-vendors-columns-desktop: {{ section.settings.columns_desktop }};
+    --ec-vendors-columns-mobile: {{ section.settings.columns_mobile | plus: 0 }};
+    --ec-vendors-card-border-color: {{ section.settings.card_border_color }};
+    --ec-vendors-card-bg: {{ section.settings.card_background_color }};
+    --ec-vendors-card-padding: {{ section.settings.card_padding }}px;
+  }
+
+  .ec-vendors-section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .ec-vendors-section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+
+  .ec-vendors__grid {
+    display: grid;
+    grid-template-columns: repeat(var(--ec-vendors-columns-mobile), 1fr);
+    gap: 1.6rem;
+  }
+
+  @media screen and (min-width: 750px) {
+    .ec-vendors__grid {
+      grid-template-columns: repeat(var(--ec-vendors-columns-desktop), 1fr);
+    }
+  }
+
+  .ec-vendors__card {
+    background-color: var(--ec-vendors-card-bg);
+    border: 2px solid var(--ec-vendors-card-border-color);
+    border-radius: 0.8rem;
+    padding: var(--ec-vendors-card-padding);
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+
+  .ec-vendors__card-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .ec-vendors__avatar-wrapper {
+    flex-shrink: 0;
+    width: 4.8rem;
+    height: 4.8rem;
+    border-radius: 50%;
+    overflow: hidden;
+    background-color: #e0e0e0;
+  }
+
+  .ec-vendors__avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ec-vendors__avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ec-vendors__avatar-placeholder svg {
+    width: 60%;
+    height: 60%;
+    fill: #9e9e9e;
+  }
+
+  .ec-vendors__info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .ec-vendors__name {
+    font-weight: 700;
+    font-size: 1.4rem;
+    line-height: 1.3;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .ec-vendors__role {
+    font-size: 1.2rem;
+    color: #666;
+    margin: 0;
+  }
+
+  .ec-vendors__badge {
+    flex-shrink: 0;
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: 50%;
+  }
+
+  .ec-vendors__divider {
+    border: none;
+    border-top: 1px solid #e0e0e0;
+    margin: 0;
+  }
+
+  .ec-vendors__products-label {
+    font-size: 1.2rem;
+    color: #666;
+    margin: 0 0 0.6rem 0;
+  }
+
+  .ec-vendors__products-icons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .ec-vendors__product-icon {
+    width: 2rem;
+    height: 2rem;
+    fill: #333;
+  }
+
+  .ec-vendors__empty {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #666;
+    font-size: 1.4rem;
+  }
+
+  .ec-vendors__heading-wrapper {
+    text-align: center;
+    margin-bottom: 3.2rem;
+  }
+
+  .ec-vendors__subtitle {
+    font-size: 1.4rem;
+    color: #666;
+    margin-top: 0.8rem;
+  }
+{%- endstyle -%}
+
+{%- liquid
+  assign metaobject_type = section.settings.metaobject_type
+  assign vendors = shop.metaobjects[metaobject_type]
+-%}
+
+<div
+  id="ec-vendors-{{ section.id }}"
+  class="ec-vendors color-{{ section.settings.color_scheme }} gradient"
+>
+  <div class="page-width ec-vendors-section-{{ section.id }}-padding">
+
+    {%- unless section.settings.title == blank and section.settings.subtitle == blank -%}
+      <div class="ec-vendors__heading-wrapper">
+        {%- unless section.settings.title == blank -%}
+          <h2 class="title inline-richtext h1">{{ section.settings.title }}</h2>
+        {%- endunless -%}
+        {%- unless section.settings.subtitle == blank -%}
+          <p class="ec-vendors__subtitle">{{ section.settings.subtitle }}</p>
+        {%- endunless -%}
+      </div>
+    {%- endunless -%}
+
+    {%- if vendors == blank or vendors.values.size == 0 -%}
+      <div class="ec-vendors__empty">
+        <p>{{ 'sections.ec_vendors.empty_state' | t: default: 'Nenhum vendedor encontrado.' }}</p>
+      </div>
+    {%- else -%}
+      <ul class="ec-vendors__grid list-unstyled" role="list">
+        {%- for vendor in vendors.values -%}
+          {%- liquid
+            assign vendor_name = vendor.fields.name.value | default: 'Vendedor'
+            assign vendor_role = vendor.fields.role.value | default: ''
+            assign vendor_avatar = vendor.fields.avatar.value
+            assign vendor_products_count = vendor.fields.products_count.value | default: 0 | plus: 0
+            assign vendor_badge_color = vendor.fields.badge_color.value | default: '#cccccc'
+          -%}
+          <li class="ec-vendors__card">
+            <div class="ec-vendors__card-header">
+              <div class="ec-vendors__avatar-wrapper">
+                {%- if vendor_avatar != blank -%}
+                  {{
+                    vendor_avatar
+                    | image_url: width: 96
+                    | image_tag:
+                      class: 'ec-vendors__avatar',
+                      alt: vendor_name,
+                      loading: 'lazy',
+                      widths: '48, 96'
+                  }}
+                {%- else -%}
+                  <div class="ec-vendors__avatar-placeholder" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
+                    </svg>
+                  </div>
+                {%- endif -%}
+              </div>
+
+              <div class="ec-vendors__info">
+                <p class="ec-vendors__name">{{ vendor_name }}</p>
+                {%- unless vendor_role == blank -%}
+                  <p class="ec-vendors__role">{{ vendor_role }}</p>
+                {%- endunless -%}
+              </div>
+
+              <div
+                class="ec-vendors__badge"
+                style="background-color: {{ vendor_badge_color }};"
+                aria-hidden="true"
+              ></div>
+            </div>
+
+            {%- if vendor_products_count > 0 -%}
+              <hr class="ec-vendors__divider">
+              <div class="ec-vendors__products">
+                <p class="ec-vendors__products-label">Produtos vendidos</p>
+                <div class="ec-vendors__products-icons" aria-label="{{ vendor_products_count }} produtos vendidos">
+                  {%- assign max_icons = vendor_products_count | at_most: 12 -%}
+                  {%- for i in (1..max_icons) -%}
+                    <svg class="ec-vendors__product-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                      <path d="M16 4.5C16 3.12 14.88 2 13.5 2h-3C9.12 2 8 3.12 8 4.5H2l1.5 8h17L22 4.5h-6zm-6 0c0-.83.67-1.5 1.5-1.5h1c.83 0 1.5.67 1.5 1.5H10zM3.5 14v6h17v-6h-17z"/>
+                    </svg>
+                  {%- endfor -%}
+                  {%- if vendor_products_count > 12 -%}
+                    <span style="font-size:1.2rem;color:#666;align-self:center;">+{{ vendor_products_count | minus: 12 }}</span>
+                  {%- endif -%}
+                </div>
+              </div>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Vendedores (Metaobject)",
+  "tag": "section",
+  "class": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Conteúdo"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Título da seção",
+      "default": "Nossos Vendedores"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtítulo da seção",
+      "default": "Conheça nossa equipe de vendedores"
+    },
+    {
+      "type": "text",
+      "id": "metaobject_type",
+      "label": "Handle do Metaobject",
+      "default": "store_vendor",
+      "info": "Exatamente como definido em Admin > Conteúdo > Metaobjects (ex: store_vendor)"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "Itens por linha (desktop)",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "Itens por linha (mobile)",
+      "options": [
+        { "value": "1", "label": "1" },
+        { "value": "2", "label": "2" }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "header",
+      "content": "Estilo dos Cards"
+    },
+    {
+      "type": "color",
+      "id": "card_border_color",
+      "label": "Cor da borda",
+      "default": "#e8c84a"
+    },
+    {
+      "type": "color",
+      "id": "card_background_color",
+      "label": "Cor de fundo do card",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "card_padding",
+      "label": "Espaçamento interno (padding)",
+      "min": 8,
+      "max": 48,
+      "step": 4,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Cores da Seção"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Esquema de cores",
+      "options": [
+        { "value": "accent-1", "label": "Accent 1" },
+        { "value": "accent-2", "label": "Accent 2" },
+        { "value": "background-1", "label": "Background 1" },
+        { "value": "background-2", "label": "Background 2" },
+        { "value": "inverse", "label": "Inverse" }
+      ],
+      "default": "background-1"
+    },
+    {
+      "type": "header",
+      "content": "Espaçamento da Seção"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 36
+    }
+  ],
+  "presets": [
+    {
+      "name": "Vendedores (Metaobject)",
+      "settings": {
+        "title": "Nossos Vendedores",
+        "subtitle": "Conheça nossa equipe de vendedores",
+        "metaobject_type": "store_vendor",
+        "columns_desktop": 3,
+        "columns_mobile": "1"
+      }
+    }
+  ]
+}
+{% endschema %}
