@@ -169,13 +169,8 @@
       </div>
     {%- endunless -%}
 
-    {%- if vendors == blank or vendors.values.size == 0 -%}
-      <div class="ec-vendors__empty">
-        <p>{{ 'sections.ec_vendors.empty_state' | t: default: 'Nenhum vendedor encontrado.' }}</p>
-      </div>
-    {%- else -%}
-      <ul class="ec-vendors__grid list-unstyled" role="list">
-        {%- for vendor in vendors.values -%}
+    <ul class="ec-vendors__grid" role="list">
+      {%- for vendor in vendors -%}
           {%- liquid
             assign vendor_name = vendor.fields.name.value | default: 'Vendedor'
             assign vendor_role = vendor.fields.role.value | default: ''
@@ -237,9 +232,12 @@
               </div>
             {%- endif -%}
           </li>
-        {%- endfor -%}
-      </ul>
-    {%- endif -%}
+      {%- else -%}
+        <li class="ec-vendors__empty">
+          <p>Nenhum vendedor encontrado.</p>
+        </li>
+      {%- endfor -%}
+    </ul>
 
   </div>
 </div>
