@@ -13,14 +13,14 @@
       "type": "ec-vendors-metaobject",
       "name": "Vendedores (Metaobject)",
       "settings": {
-        "title": "Nossos Vendedores",
-        "subtitle": "Conheça nossa equipe de vendedores",
+        "title": "Desafio Shopify",
+        "subtitle": "Seção para mostrar vendedores disponíveis de uma loja",
         "metaobject_type": "store_vendor",
         "columns_desktop": 3,
         "columns_mobile": "1",
         "card_border_color": "#e8c84a",
-        "card_background_color": "#ffffff",
-        "card_padding": 20,
+        "card_background_color": "#FFFCF6",
+        "card_padding": 34,
         "color_scheme": "background-1",
         "padding_top": 36,
         "padding_bottom": 36
