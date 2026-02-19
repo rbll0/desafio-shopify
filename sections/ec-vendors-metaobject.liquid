@@ -239,9 +239,14 @@
                 <div class="ec-vendors__products-icons" aria-label="{{ vendor_products_count }} produtos vendidos">
                   {%- assign max_icons = vendor_products_count | at_most: 12 -%}
                   {%- for i in (1..max_icons) -%}
-                    <svg class="ec-vendors__product-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                      <path d="M16 4.5C16 3.12 14.88 2 13.5 2h-3C9.12 2 8 3.12 8 4.5H2l1.5 8h17L22 4.5h-6zm-6 0c0-.83.67-1.5 1.5-1.5h1c.83 0 1.5.67 1.5 1.5H10zM3.5 14v6h17v-6h-17z"/>
-                    </svg>
+                    <img
+                      src="{{ 't-shirt.svg' | asset_url }}"
+                      alt=""
+                      class="ec-vendors__product-icon"
+                      width="20"
+                      height="20"
+                      aria-hidden="true"
+                    >
                   {%- endfor -%}
                   {%- if vendor_products_count > 12 -%}
                     <span style="font-size:1.2rem;color:#666;align-self:center;">+{{ vendor_products_count | minus: 12 }}</span>
