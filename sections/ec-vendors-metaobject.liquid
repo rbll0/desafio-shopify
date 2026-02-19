@@ -157,11 +157,6 @@
   }
 {%- endstyle -%}
 
-{%- liquid
-  assign metaobject_type = section.settings.metaobject_type
-  assign vendors = shop.metaobjects[metaobject_type]
--%}
-
 <div
   id="ec-vendors-{{ section.id }}"
   class="ec-vendors color-{{ section.settings.color_scheme }} gradient"
@@ -179,15 +174,23 @@
       </div>
     {%- endunless -%}
 
-    <ul class="ec-vendors__grid" role="list">
-      {%- for vendor in vendors -%}
+    {%- assign all_vendors = shop.metaobjects.store_vendor.values -%}
+
+    {%- if all_vendors.size > 0 -%}
+      <ul class="ec-vendors__grid" role="list">
+        {%- for vendor in all_vendors -%}
           {%- liquid
-            assign vendor_name = vendor.fields.name.value | default: 'Vendedor'
-            assign vendor_role = vendor.fields.role.value | default: ''
-            assign vendor_avatar = vendor.fields.avatar.value
-            assign vendor_products_count = vendor.fields.products_count.value | default: 0 | plus: 0
-            assign vendor_badge_tier = vendor.fields.badge_tier.value
+            assign vendor_name = vendor.name.value
+            if vendor_name == blank
+              assign vendor_name = 'Vendedor'
+            endif
+
+            assign vendor_role = vendor.role.value
+            assign vendor_avatar = vendor.avatar.value
+            assign vendor_products_count = vendor.products_count.value | default: 0 | times: 1
+            assign vendor_badge_tier = vendor.badge_tier.value
           -%}
+
           <li class="ec-vendors__card">
             <div class="ec-vendors__card-header">
               <div class="ec-vendors__avatar-wrapper">
@@ -212,9 +215,9 @@
 
               <div class="ec-vendors__info">
                 <p class="ec-vendors__name">{{ vendor_name }}</p>
-                {%- unless vendor_role == blank -%}
+                {%- if vendor_role != blank -%}
                   <p class="ec-vendors__role">{{ vendor_role }}</p>
-                {%- endunless -%}
+                {%- endif -%}
               </div>
 
               {%- if vendor_badge_tier != blank -%}
@@ -249,18 +252,23 @@
                     >
                   {%- endfor -%}
                   {%- if vendor_products_count > 12 -%}
-                    <span style="font-size:1.2rem;color:#666;align-self:center;">+{{ vendor_products_count | minus: 12 }}</span>
+                    <span style="font-size:1.2rem;color:#666;align-self:center;">
+                      +{{ vendor_products_count | minus: 12 }}
+                    </span>
                   {%- endif -%}
                 </div>
               </div>
             {%- endif -%}
           </li>
-      {%- else -%}
+        {%- endfor -%}
+      </ul>
+    {%- else -%}
+      <ul class="ec-vendors__grid" role="list">
         <li class="ec-vendors__empty">
           <p>Nenhum vendedor encontrado.</p>
         </li>
-      {%- endfor -%}
-    </ul>
+      </ul>
+    {%- endif -%}
 
   </div>
 </div>
